@@ -1,6 +1,6 @@
 # 🧠 DevPulse
 
-> **Autonomous engineering intelligence agent** — a multi-agent LangGraph system that monitors your GitHub repos, researches relevant papers and news, and delivers a daily digest to Slack or email.
+> **Autonomous engineering intelligence agent** — a multi-agent system that monitors your GitHub repos, researches relevant papers and news, and delivers a daily digest to Slack or email.
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue) ![LangGraph](https://img.shields.io/badge/LangGraph-0.2+-green) ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-teal) ![License](https://img.shields.io/badge/license-MIT-orange)
 
