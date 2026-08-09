@@ -13,8 +13,7 @@ DevPulse runs on a schedule (default: 8am weekdays) and produces a Markdown dige
 | 🔧 PR Reviews | GitHub API | LLM code review + action items for your open PRs |
 | 📊 Monitoring | GitHub Releases + Status APIs | New releases for tools you care about + API outages |
 
-Delivered to **Slack** and/or **email** automatically.
-
+Delivered to discord everyday, yay
 ---
 
 ## Architecture
