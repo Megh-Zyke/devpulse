@@ -2,10 +2,8 @@ name: Daily DevPulse Digest
 
 on:
   schedule:
-    # 8:00 AM ET = 12:00 UTC (EDT, Mar-Nov) / 13:00 UTC (EST, Nov-Mar).
-    # GitHub Actions cron doesn't follow DST, so this drifts to ~7am ET in winter.
     - cron: "0 12 * * *"
-  workflow_dispatch: {}  # allows manual "Run workflow" from the Actions tab
+  workflow_dispatch: {}  
 
 jobs:
   run-digest:
