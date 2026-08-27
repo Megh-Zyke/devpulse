@@ -43,40 +43,6 @@ def fetch_arxiv(topics: list[str], max_results: int = 5) -> list[dict]:
         })
     return results
 
-
-# ── Tool: HackerNews ──────────────────────────────────────────────────────────
-
-def fetch_hackernews(topics: list[str], max_results: int = 5) -> list[dict]:
-    """Search HackerNews Algolia API for topic-relevant stories."""
-    results = []
-    seen = set()
-    yesterday = int((datetime.now() - timedelta(days=1)).timestamp())
-
-    for topic in topics[:3]:   # limit API calls
-        url = (
-            f"https://hn.algolia.com/api/v1/search"
-            f"?query={quote(topic)}&tags=story"
-            f"&numericFilters=created_at_i>{yesterday}"
-            f"&hitsPerPage={max_results}"
-        )
-        try:
-            resp = httpx.get(url, timeout=10)
-            resp.raise_for_status()
-            for hit in resp.json().get("hits", []):
-                hn_url = hit.get("url") or f"https://news.ycombinator.com/item?id={hit['objectID']}"
-                if hn_url not in seen:
-                    seen.add(hn_url)
-                    results.append({
-                        "title": hit.get("title", ""),
-                        "summary": f"HN points: {hit.get('points', 0)} | comments: {hit.get('num_comments', 0)}",
-                        "url": hn_url,
-                        "source": "hackernews",
-                    })
-        except Exception:
-            pass
-    return results[:max_results]
-
-
 # ── Summariser ────────────────────────────────────────────────────────────────
 
 summarise_prompt = ChatPromptTemplate.from_messages([
@@ -111,15 +77,12 @@ def research_agent(state: DevPulseState) -> dict:
     items: list[ResearchItem] = []
     errors: list[str] = []
 
-    # Fetch from both sources
     raw = []
     try:
         raw += fetch_arxiv(topics, max_results=4)
     except Exception as e:
         errors.append(f"research_agent/arxiv: {e}")
 
-    try:
-        raw += fetch_hackernews(topics, max_results=4)
     except Exception as e:
         errors.append(f"research_agent/hackernews: {e}")
 

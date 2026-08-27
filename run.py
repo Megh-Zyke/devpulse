@@ -64,7 +64,7 @@ async def main(topics: list[str], repos: list[str], no_send: bool):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run DevPulse")
     parser.add_argument("--topics", default=os.getenv("TOPICS", "LangGraph,FastAPI,MLOps"))
-    parser.add_argument("--repos", default=os.getenv("GITHUB_REPOS", ""))
+    parser.add_argument("--repos", default=os.getenv("REPOS", ""))
     parser.add_argument("--no-send", action="store_true", help="Skip Discord delivery")
     args = parser.parse_args()
 
