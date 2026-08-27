@@ -17,8 +17,9 @@ from core.state import DevPulseState, MonitorAlert
 
 GITHUB_RELEASE_WATCHES = [
     "SimplifyJobs/New-Grad-Positions",
-    "speedyapply/2027-AI-College-Jobs"
-    
+    "speedyapply/2027-AI-College-Jobs",
+    "huggingface/smolagents",
+    "princeton-nlp/SWE-agent"
 ]
 
 API_STATUS_PAGES = [
