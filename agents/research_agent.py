@@ -8,6 +8,7 @@ from __future__ import annotations
 import httpx
 import feedparser
 from datetime import datetime, timedelta
+from urllib.parse import quote
 
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
@@ -17,7 +18,7 @@ from core.state import DevPulseState, ResearchItem
 
 # ── LLM ───────────────────────────────────────────────────────────────────────
 
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0, max_retries=6)
 
 
 # ── Tool: ArXiv ───────────────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ def fetch_arxiv(topics: list[str], max_results: int = 5) -> list[dict]:
     query = " OR ".join(f'"{t}"' for t in topics)
     url = (
         f"https://export.arxiv.org/api/query"
-        f"?search_query=all:{query}"
+        f"?search_query=all:{quote(query)}"
         f"&sortBy=submittedDate&sortOrder=descending"
         f"&max_results={max_results}"
     )
@@ -54,7 +55,7 @@ def fetch_hackernews(topics: list[str], max_results: int = 5) -> list[dict]:
     for topic in topics[:3]:   # limit API calls
         url = (
             f"https://hn.algolia.com/api/v1/search"
-            f"?query={topic}&tags=story"
+            f"?query={quote(topic)}&tags=story"
             f"&numericFilters=created_at_i>{yesterday}"
             f"&hitsPerPage={max_results}"
         )

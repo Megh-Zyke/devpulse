@@ -1,7 +1,7 @@
 """
 Digest Agent
 Aggregates outputs from all agents into a Markdown digest,
-then sends it to Slack and/or email.
+sends it to Discord, and persists the run to Firestore.
 """
 
 from __future__ import annotations
@@ -13,11 +13,12 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
 from core.state import DevPulseState
+from core.firestore_client import save_run
 
 
 # ── LLM: Generate the digest narrative ────────────────────────────────────────
 
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.3)
+llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0.3, max_retries=6)
 
 digest_prompt = ChatPromptTemplate.from_messages([
     ("system", (
@@ -124,28 +125,6 @@ def send_discord(markdown: str) -> None:
         httpx.post(webhook, json={"content": chunk}, timeout=10)
 
 
-def send_email(markdown: str, date: str) -> None:
-    api_key = os.getenv("RESEND_API_KEY")
-    to = os.getenv("DIGEST_EMAIL_TO")
-    from_addr = os.getenv("DIGEST_EMAIL_FROM", "devpulse@resend.dev")
-    if not api_key or not to:
-        return
-
-    # Convert minimal markdown to HTML
-    html = markdown.replace("\n", "<br>").replace("# ", "<h1>").replace("## ", "<h2>")
-    httpx.post(
-        "https://api.resend.com/emails",
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={
-            "from": from_addr,
-            "to": [to],
-            "subject": f"🧠 DevPulse — {date}",
-            "html": f"<div style='font-family:monospace'>{html}</div>",
-        },
-        timeout=10,
-    )
-
-
 # ── Agent node ────────────────────────────────────────────────────────────────
 
 def digest_agent(state: DevPulseState) -> dict:
@@ -161,9 +140,9 @@ def digest_agent(state: DevPulseState) -> dict:
         errors.append(f"digest_agent/discord: {e}")
 
     try:
-        send_email(digest_md, state.get("run_date", ""))
+        save_run(state, digest_md)
     except Exception as e:
-        errors.append(f"digest_agent/email: {e}")
+        errors.append(f"digest_agent/firestore: {e}")
 
     return {
         "digest_markdown": digest_md,

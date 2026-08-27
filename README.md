@@ -1,6 +1,6 @@
 # DevPulse
 
-> **Autonomous engineering intelligence agent** — a multi-agent system that monitors your GitHub repos, researches relevant papers and news, and delivers a daily digest to Slack or email.
+> **Autonomous engineering intelligence agent** — a multi-agent system that monitors your GitHub repos, researches relevant papers and news, and delivers a daily digest to Discord.
 ---
 
 ## What it does
@@ -13,7 +13,7 @@ DevPulse runs on a schedule (default: 8am weekdays) and produces a Markdown dige
 | 🔧 PR Reviews | GitHub API | LLM code review + action items for your open PRs |
 | 📊 Monitoring | GitHub Releases + Status APIs | New releases for tools you care about + API outages |
 
-Delivered to discord everyday, yay
+Delivered to Discord every day, and every run is persisted to Firestore for history.
 ---
 
 ## Architecture
@@ -34,7 +34,7 @@ Delivered to discord everyday, yay
 │   └────┬──────┴───────────┘                     │
 │        │  merge (shared state)                  │
 │        ▼                                        │
-│   digest_agent ──► Slack / Email                │
+│   digest_agent ──► Discord + Firestore          │
 │        │                                        │
 │       END                                       │
 └─────────────────────────────────────────────────┘
@@ -64,7 +64,7 @@ GROQ_API_KEY=gsk_...
 ### 3. Run a digest now (CLI)
 
 ```bash
-# Run and print digest, no Slack/email delivery
+# Run and print digest, no Discord delivery
 python run.py --no-send
 
 # Run with custom topics
@@ -74,7 +74,22 @@ python run.py --topics "Rust,PostgreSQL,LangGraph" --no-send
 python run.py
 ```
 
-### 4. Start the server
+### 4. (Optional) Persist runs to Firestore
+
+Every run's agent output (research items, PR reviews, monitor alerts, and the
+final digest) is saved to a Firebase Firestore `digests` collection, keyed by
+date, so history survives restarts.
+
+1. Create a Firebase project at https://console.firebase.google.com and enable Firestore.
+2. Project settings → Service accounts → Generate new private key.
+3. Save the downloaded JSON as `firebase-credentials.json` in the project root
+   (or set `FIREBASE_CREDENTIALS_JSON` to the JSON contents directly, useful on
+   hosts without a persistent filesystem).
+
+If no credentials are configured, DevPulse still runs — Firestore writes are
+simply skipped.
+
+### 5. Start the server
 
 ```bash
 uvicorn api.server:app --reload

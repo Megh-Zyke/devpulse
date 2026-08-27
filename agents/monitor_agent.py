@@ -16,26 +16,9 @@ from core.state import DevPulseState, MonitorAlert
 # Edit this list to track whatever tools matter to you.
 
 GITHUB_RELEASE_WATCHES = [
-    "langchain-ai/langgraph",
-    "langchain-ai/langchain",
-    "openai/openai-python",
-    "tiangolo/fastapi",
-    "pydantic/pydantic",
-    "TransformerLensOrg/TransformerLens",
-    "jbloomAus/SAELens",
-    "EleutherAI/elk",
-    "PKU-Alignment/safe-rlhf",
-    "EleutherAI/lm-evaluation-harness",
-    "huggingface/alignment-handbook",
-    "openai/evals",
-    "openai/weak-to-strong",
-        "vllm-project/vllm",
-    "huggingface/transformers",
-    "huggingface/trl",
-    "OpenRLHF/OpenRLHF",
-    "verl-project/verl",
-    "Lightning-AI/litgpt",
-    "microsoft/promptbench",
+    "SimplifyJobs/New-Grad-Positions",
+    "speedyapply/2027-AI-College-Jobs"
+    
 ]
 
 API_STATUS_PAGES = [
