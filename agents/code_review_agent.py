@@ -139,9 +139,11 @@ def code_review_agent(state: DevPulseState) -> dict:
                         action_items=action_items,
                     ))
                 except Exception as e:
-                    errors.append(f"code_review_agent/pr#{pr.number}: {e}")
+                    detail = f"{e!r}" + (f" caused by {e.__cause__!r}" if e.__cause__ else "")
+                    errors.append(f"code_review_agent/pr#{pr.number}: {detail}")
         except Exception as e:
-            errors.append(f"code_review_agent/{repo_name}: {e}")
+            detail = f"{e!r}" + (f" caused by {e.__cause__!r}" if e.__cause__ else "")
+            errors.append(f"code_review_agent/{repo_name}: {detail}")
 
     return {
         "pr_reviews": reviews,

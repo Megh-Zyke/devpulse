@@ -94,7 +94,8 @@ def research_agent(state: DevPulseState) -> dict:
                 source=item["source"],
             ))
         except Exception as e:
-            errors.append(f"research_agent/summarise: {e}")
+            detail = f"{e!r}" + (f" caused by {e.__cause__!r}" if e.__cause__ else "")
+            errors.append(f"research_agent/summarise: {detail}")
 
     return {
         "research_items": items,
