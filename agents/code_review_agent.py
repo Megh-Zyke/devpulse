@@ -50,6 +50,17 @@ def parse_review(text: str) -> tuple[str, list[str]]:
 
 # ── GitHub helpers ────────────────────────────────────────────────────────────
 
+def discover_repos(gh: Github, max_repos: int = 20) -> list[str]:
+    """Return the caller's own (non-fork) repos, most recently updated first."""
+    user = gh.get_user()
+    repos = [
+        r.full_name
+        for r in user.get_repos(affiliation="owner", sort="updated", direction="desc")
+        if not r.fork
+    ]
+    return repos[:max_repos]
+
+
 def get_open_prs(repo_name: str, gh: Github) -> list:
     """Return open PRs updated in last 24h."""
     try:
@@ -82,17 +93,30 @@ def code_review_agent(state: DevPulseState) -> dict:
     LangGraph node: reviews open PRs across configured repos.
     """
     token = os.getenv("GITHUB_TOKEN")
-    repos = state.get("github_repos", [])
-
-    if not token or not repos:
+    if not token:
         return {
             "tasks_completed": ["code_review"],
-            "errors": ["code_review_agent: GITHUB_TOKEN or repos not configured — skipping."],
+            "errors": ["code_review_agent: GITHUB_TOKEN not configured — skipping."],
         }
 
     gh = Github(token)
     reviews: list[PRReview] = []
     errors: list[str] = []
+
+    repos = state.get("github_repos", [])
+    if not repos:
+        try:
+            repos = discover_repos(gh)
+        except GithubException as e:
+            return {
+                "tasks_completed": ["code_review"],
+                "errors": [f"code_review_agent/discover_repos: {e}"],
+            }
+        if not repos:
+            return {
+                "tasks_completed": ["code_review"],
+                "errors": ["code_review_agent: no owned repos found for this token — skipping."],
+            }
 
     for repo_name in repos:
         try:

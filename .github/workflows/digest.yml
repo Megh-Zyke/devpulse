@@ -21,6 +21,7 @@ jobs:
       - name: Run DevPulse
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           TOPICS: ${{ vars.TOPICS }}
           REPOS: ${{ vars.REPOS }}

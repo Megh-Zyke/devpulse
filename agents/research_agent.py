@@ -83,9 +83,6 @@ def research_agent(state: DevPulseState) -> dict:
     except Exception as e:
         errors.append(f"research_agent/arxiv: {e}")
 
-    except Exception as e:
-        errors.append(f"research_agent/hackernews: {e}")
-
     # Summarise each item with LLM
     for item in raw:
         try:
