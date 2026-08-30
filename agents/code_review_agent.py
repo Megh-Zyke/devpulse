@@ -11,6 +11,7 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
 from core.state import DevPulseState, PRReview
+from core.errors import safe_error_detail
 
 
 # ── LLM ───────────────────────────────────────────────────────────────────────
@@ -139,11 +140,9 @@ def code_review_agent(state: DevPulseState) -> dict:
                         action_items=action_items,
                     ))
                 except Exception as e:
-                    detail = f"{e!r}" + (f" caused by {e.__cause__!r}" if e.__cause__ else "")
-                    errors.append(f"code_review_agent/pr#{pr.number}: {detail}")
+                    errors.append(f"code_review_agent/pr#{pr.number}: {safe_error_detail(e)}")
         except Exception as e:
-            detail = f"{e!r}" + (f" caused by {e.__cause__!r}" if e.__cause__ else "")
-            errors.append(f"code_review_agent/{repo_name}: {detail}")
+            errors.append(f"code_review_agent/{repo_name}: {safe_error_detail(e)}")
 
     return {
         "pr_reviews": reviews,

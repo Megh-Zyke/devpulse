@@ -14,6 +14,7 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
 from core.state import DevPulseState, ResearchItem
+from core.errors import safe_error_detail
 
 
 # ── LLM ───────────────────────────────────────────────────────────────────────
@@ -94,8 +95,7 @@ def research_agent(state: DevPulseState) -> dict:
                 source=item["source"],
             ))
         except Exception as e:
-            detail = f"{e!r}" + (f" caused by {e.__cause__!r}" if e.__cause__ else "")
-            errors.append(f"research_agent/summarise: {detail}")
+            errors.append(f"research_agent/summarise: {safe_error_detail(e)}")
 
     return {
         "research_items": items,
